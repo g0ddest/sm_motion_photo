@@ -39,8 +39,8 @@ matrix:
         - cargo install-update -a
       script: # rm lock file https://github.com/rust-lang/rust/issues/67423
         - |
-          rm -rf Cargo.lock &&
           cargo build --verbose &&
+          rm -rf Cargo.lock &&
           cargo coverage --verbose &&
           bash <(curl -s https://codecov.io/bash) -s target/kcov
       addons: # required for kcov
