@@ -1,6 +1,8 @@
 SM Motion Photo
 ===============
 
+[![Build Status](https://travis-ci.org/g0ddest/sm_motion_photo.svg?branch=master)](https://travis-ci.org/g0ddest/sm_motion_photo)
+
 This crate can be used to extract Motion Photo taken on Samsung phone (if it provides such feature and this feature is turned on) and saves it in MP4. You can also check if the photo has video and get meta information from the video.
 
 This feature is available on Galaxy S20, S20+, S20 Ultra, Z Flip, Note10, Note10+, S10e, S10, S10+, Fold, Note9, S9, S9+, Note8, S8, S8+, S7, and S7 edge.
