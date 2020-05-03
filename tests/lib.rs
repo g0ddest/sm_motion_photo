@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use sm_motion_photo::SmMotion;
-    use std::fs::File;
-    use std::env;
     use mp4parse::TrackType::Video;
+    use sm_motion_photo::SmMotion;
+    use std::env;
+    use std::fs::File;
 
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -81,5 +81,4 @@ mod tests {
 
         assert_eq!(sm_motion.has_video(), true)
     }
-
 }

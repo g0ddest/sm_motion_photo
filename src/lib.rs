@@ -1,8 +1,8 @@
-use memmap::Mmap;
-use std::fs::File;
-use core::slice::Iter;
 use boyer_moore_magiclen::{BMByte, BMByteSearchable};
+use core::slice::Iter;
+use memmap::Mmap;
 use mp4parse::MediaContext;
+use std::fs::File;
 use std::io::Write;
 
 // Implementing Bytes struct to use boyer moore search in [u8]
@@ -71,25 +71,10 @@ impl SmMotion {
 
     /// Look for starting MP4 index in Samsung Motion Photo JPEG file
     pub fn find_video_index(&mut self) -> Result<Option<usize>, &'static str> {
-
         // This line is an indicator of ending JPEG file and starting MP4 file
         let indicator: Vec<u8> = vec![
-            0x4D,
-            0x6F,
-            0x74,
-            0x69,
-            0x6F,
-            0x6E,
-            0x50,
-            0x68,
-            0x6F,
-            0x74,
-            0x6F,
-            0x5F,
-            0x44,
-            0x61,
-            0x74,
-            0x61,
+            0x4D, 0x6F, 0x74, 0x69, 0x6F, 0x6E, 0x50, 0x68, 0x6F, 0x74, 0x6F, 0x5F, 0x44, 0x61,
+            0x74, 0x61,
         ];
 
         // Using boyer moore for faster search of vec position in a file
@@ -101,19 +86,17 @@ impl SmMotion {
             Some(index) => Some(index + 16),
             None => None,
         };
-        return Ok(self.video_index);
+        Ok(self.video_index)
     }
 
     /// Check if a photo has a Motion Photo feature
     pub fn has_video(&mut self) -> bool {
         match self.video_index {
             Some(_) => true,
-            None => {
-                match self.find_video_index() {
-                    Ok(_) => self.has_video(),
-                    Err(_) => false,
-                }
-            }
+            None => match self.find_video_index() {
+                Ok(_) => self.has_video(),
+                Err(_) => false,
+            },
         }
     }
 
@@ -126,12 +109,10 @@ impl SmMotion {
                 let _ = mp4parse::read_mp4(&mut video_content, &mut context);
                 Some(context)
             }
-            None => {
-                match &self.find_video_index() {
-                    Ok(_) => self.find_video_context(),
-                    Err(_) => None,
-                }
-            }
+            None => match &self.find_video_index() {
+                Ok(_) => self.find_video_context(),
+                Err(_) => None,
+            },
         }
     }
 
@@ -157,12 +138,10 @@ impl SmMotion {
                     Err(_) => Err("Can't write to file"),
                 }
             }
-            None => {
-                match self.find_video_index() {
-                    Ok(_) => self.dump_video_file(file),
-                    Err(e) => Err(e),
-                }
-            }
+            None => match self.find_video_index() {
+                Ok(_) => self.dump_video_file(file),
+                Err(e) => Err(e),
+            },
         }
     }
 }
