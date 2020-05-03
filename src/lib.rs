@@ -37,10 +37,10 @@ impl<'a> BMByteSearchable for Bytes<'a> {
 /// use sm_motion_photo::SmMotion;
 ///
 /// // open file
-/// let photo_file = File::open("photo.jpg").unwrap();
+/// let photo_file = File::open("tests/data/photo.jpg").unwrap();
 /// let mut sm = SmMotion::with(&photo_file).unwrap();
 /// println!("JPEG file contains video? {:?}", sm.has_video());
-/// let mut video_file = File::create("video.mp4").unwrap();
+/// let mut video_file = File::create("tests/data/video.mp4").unwrap();
 /// // dump mp4 from jpeg
 /// sm.dump_video_file(&mut video_file).unwrap();
 /// // get video duration (no dump needed)
