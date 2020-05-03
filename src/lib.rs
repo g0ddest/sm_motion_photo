@@ -120,16 +120,12 @@ impl SmMotion {
 
     /// Gen length of video file in photo in milliseconds
     pub fn get_video_file_duration(&mut self) -> Option<u64> {
-        match self.find_video_context() {
-            Some(context) => {
-                if context.tracks.len() != 1 {
-                    return None
-                }
-                match context.tracks[0].tkhd.as_ref() {
-                    Some(tkhd) => Some(tkhd.duration),
-                    None => None
-                }
-            },
+        let context = self.find_video_context()?;
+        if context.tracks.len() != 1 {
+            return None
+        }
+        match context.tracks[0].tkhd.as_ref() {
+            Some(tkhd) => Some(tkhd.duration),
             None => None
         }
     }
