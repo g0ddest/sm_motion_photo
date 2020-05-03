@@ -2,6 +2,7 @@ SM Motion Photo
 ===============
 
 [![Build Status](https://travis-ci.org/g0ddest/sm_motion_photo.svg?branch=master)](https://travis-ci.org/g0ddest/sm_motion_photo)
+[![codecov](https://codecov.io/gh/g0ddest/sm_motion_photo/branch/master/graph/badge.svg)](https://codecov.io/gh/g0ddest/sm_motion_photo)
 
 This crate can be used to extract Motion Photo taken on Samsung phone (if it provides such feature and this feature is turned on) and saves it in MP4. You can also check if the photo has video and get meta information from the video.
 
