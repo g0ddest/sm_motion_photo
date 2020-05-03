@@ -6,7 +6,7 @@ This crate can be used to extract Motion Photo taken on Samsung phone (if it pro
 This feature is available on Galaxy S20, S20+, S20 Ultra, Z Flip, Note10, Note10+, S10e, S10, S10+, Fold, Note9, S9, S9+, Note8, S8, S8+, S7, and S7 edge.
 
 ## Usage
-```
+```rust
 use std::fs::File;
 use sm_motion_photo::SmMotion;
 
