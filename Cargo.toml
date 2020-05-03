@@ -1,8 +1,13 @@
 [package]
 name = "sm_motion_photo"
 version = "0.1.0"
-authors = ["vitaliy <vitaliy@velikodniy.name>"]
+authors = ["Vitaliy Velikodniy <vitaliy@velikodniy.name>"]
 edition = "2018"
+repository = "https://github.com/g0ddest/sm_motion_photo"
+description = "Extract video from Samsung Motion Photo."
+keywords = ["motion-photo"]
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
