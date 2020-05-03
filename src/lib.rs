@@ -33,9 +33,10 @@ impl<'a> BMByteSearchable for Bytes<'a> {
 ///
 /// Example of usage:
 /// ```
-/// // open file
 /// use std::fs::File;
 /// use sm_motion_photo::SmMotion;
+///
+/// // open file
 /// let photo_file = File::open("photo.jpg")?;
 ///  let mut sm = SmMotion::with(&photo_file)?;
 ///  println!("JPEG file contains video? {:?}", sm.has_video());
