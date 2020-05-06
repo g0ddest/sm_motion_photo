@@ -120,7 +120,7 @@ mod tests {
         let _ = match SmMotion::with(&get_wrong_photo_file()) {
             Some(sm) => {
                 assert!(sm.find_video_context().is_none());
-            },
+            }
             None => panic!("Not created motion"),
         };
     }
@@ -130,7 +130,7 @@ mod tests {
         let _ = match SmMotion::with(&get_wrong_photo_file()) {
             Some(sm) => {
                 assert_eq!(sm.has_video(), false);
-            },
+            }
             None => panic!("Not created motion"),
         };
     }
@@ -139,7 +139,9 @@ mod tests {
     fn test_fail_dump_video() {
         let _ = match SmMotion::with(&get_wrong_photo_file()) {
             Some(sm) => {
-                assert!(sm.dump_video_file(&mut create_video_file(TMP_VIDEO_)).is_err());
+                assert!(sm
+                    .dump_video_file(&mut create_video_file(TMP_VIDEO_))
+                    .is_err());
             },
             None => panic!("Not created motion"),
         };
@@ -163,7 +165,7 @@ mod tests {
         let _ = match SmMotion::with(&get_wrong_photo_file()) {
             Some(sm) => {
                 assert!(sm.dump_video_file(&mut get_empty_file()).is_err());
-            },
+            }
             None => panic!("Not created motion"),
         };
     }
