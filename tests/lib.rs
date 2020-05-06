@@ -7,10 +7,21 @@ mod tests {
 
     const VIDEO_INDEX: usize = 3366251;
     const VIDEO_DURATION: u64 = 2932;
+    const TMP_VIDEO: &str = "tests/tmp/foo.mp4";
 
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         File::open(format!("{}/{}", dir, "tests/data/photo.jpg")).unwrap()
+    }
+
+    fn get_wrong_photo_file() -> File {
+        let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        File::open(format!("{}/{}", dir, "tests/data/blank.jpg")).unwrap()
+    }
+
+    fn create_video_file() -> File {
+        let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        File::create(format!("{}/{}", dir, TMP_VIDEO)).unwrap()
     }
 
     #[test]
@@ -37,10 +48,9 @@ mod tests {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
-        let file_path = "tests/tmp/foo.mp4";
-        let mut file = File::create(file_path).unwrap();
+        let mut file = create_video_file();
         let _ = sm_motion.dump_video_file(&mut file);
-        let mut open_file = File::open(file_path).unwrap();
+        let mut open_file = File::open(TMP_VIDEO).unwrap();
         let mut context = mp4parse::MediaContext::new();
         let _ = mp4parse::read_mp4(&mut open_file, &mut context);
         assert_eq!(context.tracks.len(), 1);
@@ -96,5 +106,25 @@ mod tests {
         };
 
         assert_eq!(sm_motion.has_video(), true)
+    }
+
+    #[test]
+    fn test_fail_open_video() {
+        let _ = match SmMotion::with(&get_wrong_photo_file()) {
+            Some(sm) => {
+                assert!(sm.find_video_context().is_none());
+            },
+            None => panic!("Not created motion"),
+        };
+    }
+
+    #[test]
+    fn test_fail_dump_video() {
+        let _ = match SmMotion::with(&get_wrong_photo_file()) {
+            Some(sm) => {
+                assert!(sm.dump_video_file(&mut create_video_file()).is_err());
+            },
+            None => panic!("Not created motion"),
+        };
     }
 }
