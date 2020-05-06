@@ -49,6 +49,9 @@ impl<'a> BMByteSearchable for Bytes<'a> {
 /// println!("{:?}", sm.get_video_file_duration());
 /// // get MP4 file context
 /// println!("{:?}", sm.find_video_context());
+/// // You can also save index and use it afterwards
+/// let mut sm_cached = SmMotion::with_precalculated(&photo_file, 3366251).unwrap();
+/// println!("{:?}", sm_cached.get_video_file_duration());
 /// ```
 pub struct SmMotion {
     mmap: Mmap,
@@ -59,8 +62,25 @@ pub struct SmMotion {
 impl SmMotion {
     ///  First things first send here a file ref
     pub fn with(file: &File) -> Option<SmMotion> {
-        Some(SmMotion {
+        let mut motion = SmMotion {
             video_index: None,
+            // Don't place entire file in memory, using memory efficient memory mapping
+            mmap: match unsafe { Mmap::map(&file) } {
+                Ok(m) => m,
+                _ => return None,
+            },
+        };
+
+        let _ = motion.find_video_index();
+
+        Some(motion)
+    }
+
+    /// Initialize SmMotion with a known video index.
+    /// It's handful when you are caching the results of searching.
+    pub fn with_precalculated(file: &File, index: usize) -> Option<SmMotion> {
+        Some(SmMotion {
+            video_index: Some(index),
             // Don't place entire file in memory, using memory efficient memory mapping
             mmap: match unsafe { Mmap::map(&file) } {
                 Ok(m) => m,
@@ -101,7 +121,7 @@ impl SmMotion {
     }
 
     /// Get video context from mp4parse.
-    pub fn find_video_context(&mut self) -> Option<MediaContext> {
+    pub fn find_video_context(&self) -> Option<MediaContext> {
         match self.video_index {
             Some(index) => {
                 let mut video_content = &self.mmap[index..];
@@ -109,15 +129,12 @@ impl SmMotion {
                 let _ = mp4parse::read_mp4(&mut video_content, &mut context);
                 Some(context)
             }
-            None => match &self.find_video_index() {
-                Ok(_) => self.find_video_context(),
-                Err(_) => None,
-            },
+            None => None,
         }
     }
 
     /// Gen length of video file in photo in milliseconds
-    pub fn get_video_file_duration(&mut self) -> Option<u64> {
+    pub fn get_video_file_duration(&self) -> Option<u64> {
         let context = self.find_video_context()?;
         if context.tracks.len() != 1 {
             return None;
@@ -129,7 +146,7 @@ impl SmMotion {
     }
 
     // Save video file from image
-    pub fn dump_video_file(&mut self, file: &mut File) -> Result<(), &str> {
+    pub fn dump_video_file(&self, file: &mut File) -> Result<(), &str> {
         match self.video_index {
             Some(index) => {
                 let video_content = &self.mmap[index..];
@@ -138,10 +155,7 @@ impl SmMotion {
                     Err(_) => Err("Can't write to file"),
                 }
             }
-            None => match self.find_video_index() {
-                Ok(_) => self.dump_video_file(file),
-                Err(e) => Err(e),
-            },
+            None => Err("Video not found"),
         }
     }
 }

@@ -5,6 +5,9 @@ mod tests {
     use std::env;
     use std::fs::File;
 
+    const VIDEO_INDEX: usize = 3366251;
+    const VIDEO_DURATION: u64 = 2932;
+
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         File::open(format!("{}/{}", dir, "tests/data/photo.jpg")).unwrap()
@@ -23,14 +26,14 @@ mod tests {
         };
 
         match sm_motion.video_index {
-            Some(size) => assert_eq!(size, 3366251),
+            Some(size) => assert_eq!(size, VIDEO_INDEX),
             None => panic!("No result"),
         };
     }
 
     #[test]
     fn test_dump_video() {
-        let mut sm_motion = match SmMotion::with(&get_photo_file()) {
+        let sm_motion = match SmMotion::with(&get_photo_file()) {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
@@ -45,7 +48,7 @@ mod tests {
 
     #[test]
     fn test_meta() {
-        let mut sm_motion = match SmMotion::with(&get_photo_file()) {
+        let sm_motion = match SmMotion::with(&get_photo_file()) {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
@@ -61,13 +64,26 @@ mod tests {
 
     #[test]
     fn test_duration() {
-        let mut sm_motion = match SmMotion::with(&get_photo_file()) {
+        let sm_motion = match SmMotion::with(&get_photo_file()) {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
 
         match sm_motion.get_video_file_duration() {
-            Some(duration) => assert_eq!(duration, 2932),
+            Some(duration) => assert_eq!(duration, VIDEO_DURATION),
+            None => panic!("Not found duration"),
+        }
+    }
+
+    #[test]
+    fn test_duration_cached_index() {
+        let sm_motion = match SmMotion::with_precalculated(&get_photo_file(), VIDEO_INDEX) {
+            Some(sm) => sm,
+            None => panic!("Not created motion"),
+        };
+
+        match sm_motion.get_video_file_duration() {
+            Some(duration) => assert_eq!(duration, VIDEO_DURATION),
             None => panic!("Not found duration"),
         }
     }
