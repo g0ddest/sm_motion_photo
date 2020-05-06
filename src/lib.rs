@@ -110,13 +110,10 @@ impl SmMotion {
     }
 
     /// Check if a photo has a Motion Photo feature
-    pub fn has_video(&mut self) -> bool {
+    pub fn has_video(&self) -> bool {
         match self.video_index {
             Some(_) => true,
-            None => match self.find_video_index() {
-                Ok(_) => self.has_video(),
-                Err(_) => false,
-            },
+            None => false,
         }
     }
 

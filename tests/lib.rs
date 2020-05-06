@@ -8,6 +8,8 @@ mod tests {
     const VIDEO_INDEX: usize = 3366251;
     const VIDEO_DURATION: u64 = 2932;
     const TMP_VIDEO: &str = "tests/tmp/foo.mp4";
+    // for parallel test execution
+    const TMP_VIDEO_: &str = "tests/tmp/foo_.mp4";
 
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -19,9 +21,14 @@ mod tests {
         File::open(format!("{}/{}", dir, "tests/data/blank.jpg")).unwrap()
     }
 
-    fn create_video_file() -> File {
+    fn get_empty_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        File::create(format!("{}/{}", dir, TMP_VIDEO)).unwrap()
+        File::open(format!("{}/{}", dir, "tests/data/empty")).unwrap()
+    }
+
+    fn create_video_file(file_path: &str) -> File {
+        let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        File::create(format!("{}/{}", dir, file_path)).unwrap()
     }
 
     #[test]
@@ -48,7 +55,7 @@ mod tests {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
-        let mut file = create_video_file();
+        let mut file = create_video_file(TMP_VIDEO);
         let _ = sm_motion.dump_video_file(&mut file);
         let mut open_file = File::open(TMP_VIDEO).unwrap();
         let mut context = mp4parse::MediaContext::new();
@@ -100,7 +107,7 @@ mod tests {
 
     #[test]
     fn test_check() {
-        let mut sm_motion = match SmMotion::with(&get_photo_file()) {
+        let sm_motion = match SmMotion::with(&get_photo_file()) {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
@@ -119,10 +126,43 @@ mod tests {
     }
 
     #[test]
+    fn test_wrong_photo_no_video() {
+        let _ = match SmMotion::with(&get_wrong_photo_file()) {
+            Some(sm) => {
+                assert_eq!(sm.has_video(), false);
+            },
+            None => panic!("Not created motion"),
+        };
+    }
+
+    #[test]
     fn test_fail_dump_video() {
         let _ = match SmMotion::with(&get_wrong_photo_file()) {
             Some(sm) => {
-                assert!(sm.dump_video_file(&mut create_video_file()).is_err());
+                assert!(sm.dump_video_file(&mut create_video_file(TMP_VIDEO_)).is_err());
+            },
+            None => panic!("Not created motion"),
+        };
+    }
+
+    #[test]
+    pub fn test_mmap() {
+        let _ = match SmMotion::with(&get_empty_file()) {
+            Some(_) => panic!("Should not mmap"),
+            None => {}
+        };
+
+        let _ = match SmMotion::with_precalculated(&get_empty_file(), 0) {
+            Some(_) => panic!("Should not mmap"),
+            None => {}
+        };
+    }
+
+    #[test]
+    fn test_fail_dump_video_file_write() {
+        let _ = match SmMotion::with(&get_wrong_photo_file()) {
+            Some(sm) => {
+                assert!(sm.dump_video_file(&mut get_empty_file()).is_err());
             },
             None => panic!("Not created motion"),
         };
