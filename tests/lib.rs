@@ -142,7 +142,7 @@ mod tests {
                 assert!(sm
                     .dump_video_file(&mut create_video_file(TMP_VIDEO_))
                     .is_err());
-            },
+            }
             None => panic!("Not created motion"),
         };
     }
