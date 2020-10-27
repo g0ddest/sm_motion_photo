@@ -1,6 +1,6 @@
 [package]
 name = "sm_motion_photo"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Vitaliy Velikodniy <vitaliy@velikodniy.name>"]
 edition = "2018"
 repository = "https://github.com/g0ddest/sm_motion_photo"

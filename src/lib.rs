@@ -89,9 +89,9 @@ impl SmMotion {
         })
     }
 
-    /// Look for starting MP4 index in Samsung Motion Photo JPEG file
+    /// Look for starting MP4 index in Samsung Motion Photo JPEG (or HEIC/HEIF) file
     pub fn find_video_index(&mut self) -> Result<Option<usize>, &'static str> {
-        // This line is an indicator of ending JPEG file and starting MP4 file
+        // This line is an indicator of ending JPEG (or HEIC/HEIF) file and starting MP4 file
         let indicator: Vec<u8> = vec![
             0x4D, 0x6F, 0x74, 0x69, 0x6F, 0x6E, 0x50, 0x68, 0x6F, 0x74, 0x6F, 0x5F, 0x44, 0x61,
             0x74, 0x61,
