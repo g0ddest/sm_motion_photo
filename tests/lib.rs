@@ -6,6 +6,7 @@ mod tests {
     use std::fs::File;
 
     const VIDEO_INDEX: usize = 3366251;
+    const VIDEO_INDEX_HEIC: usize = 2749488;
     const VIDEO_DURATION: u64 = 2932;
     const TMP_VIDEO: &str = "tests/tmp/foo.mp4";
     // for parallel test execution
@@ -14,6 +15,11 @@ mod tests {
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         File::open(format!("{}/{}", dir, "tests/data/photo.jpg")).unwrap()
+    }
+
+    fn get_photo_file_heic() -> File {
+        let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        File::open(format!("{}/{}", dir, "tests/data/photo.heic")).unwrap()
     }
 
     fn get_wrong_photo_file() -> File {
@@ -50,6 +56,24 @@ mod tests {
     }
 
     #[test]
+    fn test_search_index_heic() {
+        let mut sm_motion = match SmMotion::with(&get_photo_file_heic()) {
+            Some(sm) => sm,
+            None => panic!("Not created motion"),
+        };
+
+        match sm_motion.find_video_index() {
+            Err(e) => panic!(e),
+            _result => {}
+        };
+
+        match sm_motion.video_index {
+            Some(size) => assert_eq!(size, VIDEO_INDEX_HEIC),
+            None => panic!("No result"),
+        };
+    }
+
+    #[test]
     fn test_dump_video() {
         let sm_motion = match SmMotion::with(&get_photo_file()) {
             Some(sm) => sm,
@@ -61,6 +85,20 @@ mod tests {
         let mut context = mp4parse::MediaContext::new();
         let _ = mp4parse::read_mp4(&mut open_file, &mut context);
         assert_eq!(context.tracks.len(), 1);
+    }
+
+    #[test]
+    fn test_dump_video_heic() {
+        let sm_motion = match SmMotion::with(&get_photo_file_heic()) {
+            Some(sm) => sm,
+            None => panic!("Not created motion"),
+        };
+        let mut file = create_video_file(TMP_VIDEO);
+        let _ = sm_motion.dump_video_file(&mut file);
+        let mut open_file = File::open(TMP_VIDEO).unwrap();
+        let mut context = mp4parse::MediaContext::new();
+        let _ = mp4parse::read_mp4(&mut open_file, &mut context);
+        assert_ne!(context.tracks.len(), 0);
     }
 
     #[test]

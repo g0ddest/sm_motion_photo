@@ -10,6 +10,8 @@ This crate provides functions for extracting video from [Motion Photos](https://
 
 This feature is available on Galaxy S20, S20+, S20 Ultra, Z Flip, Note10, Note10+, S10e, S10, S10+, Fold, Note9, S9, S9+, Note8, S8, S8+, S7, and S7 edge.
 
+Supports photos saved in JPEG and [HEIF (HEIC)](https://ru.wikipedia.org/wiki/HEIF) format.
+
 ## Usage
 ```rust
 use std::fs::File;
