@@ -8,6 +8,9 @@ description = "Extract video from Samsung Motion Photo. Supports JPEG, HEIF/HEIC
 keywords = ["motion-photo", "heic", "heif", "jpeg", "samsung-motion-photo"]
 readme = "README.md"
 license = "MIT"
+exclude = [
+    "tests/*",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
