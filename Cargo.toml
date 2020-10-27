@@ -4,8 +4,8 @@ version = "0.1.3"
 authors = ["Vitaliy Velikodniy <vitaliy@velikodniy.name>"]
 edition = "2018"
 repository = "https://github.com/g0ddest/sm_motion_photo"
-description = "Extract video from Samsung Motion Photo. Supports JPEG, HEIC"
-keywords = ["motion-photo"]
+description = "Extract video from Samsung Motion Photo. Supports JPEG, HEIF/HEIC"
+keywords = ["motion-photo", "heic", "heif", "jpeg", "samsung-motion-photo"]
 readme = "README.md"
 license = "MIT"
 
