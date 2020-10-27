@@ -12,9 +12,22 @@ exclude = [
     "tests/*",
 ]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 memmap = "0.7.0"
 boyer-moore-magiclen = "0.2.4"
 mp4parse = "0.11.4"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "find-index"
+harness = false
+
+[[bench]]
+name = "find-video-context"
+harness = false
+
+[[bench]]
+name = "find-video-duration"
+harness = false
