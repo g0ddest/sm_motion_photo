@@ -9,8 +9,9 @@ mod tests {
     const VIDEO_INDEX_HEIC: usize = 2749488;
     const VIDEO_DURATION: u64 = 2932;
     const TMP_VIDEO: &str = "tests/tmp/foo.mp4";
+    const TMP_VIDEO_HEIC: &str = "tests/tmp/foo.mp4";
     // for parallel test execution
-    const TMP_VIDEO_: &str = "tests/tmp/foo_.mp4";
+    const TMP_VIDEO_: &str = "tests/tmp/foo_heic_.mp4";
 
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -93,9 +94,9 @@ mod tests {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
-        let mut file = create_video_file(TMP_VIDEO);
+        let mut file = create_video_file(TMP_VIDEO_HEIC);
         let _ = sm_motion.dump_video_file(&mut file);
-        let mut open_file = File::open(TMP_VIDEO).unwrap();
+        let mut open_file = File::open(TMP_VIDEO_HEIC).unwrap();
         let mut context = mp4parse::MediaContext::new();
         let _ = mp4parse::read_mp4(&mut open_file, &mut context);
         assert_ne!(context.tracks.len(), 0);
