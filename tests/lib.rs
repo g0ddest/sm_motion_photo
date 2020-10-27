@@ -9,9 +9,9 @@ mod tests {
     const VIDEO_INDEX_HEIC: usize = 2749488;
     const VIDEO_DURATION: u64 = 2932;
     const TMP_VIDEO: &str = "tests/tmp/foo.mp4";
-    const TMP_VIDEO_HEIC: &str = "tests/tmp/foo.mp4";
+    const TMP_VIDEO_HEIC: &str = "tests/tmp/foo_heic.mp4";
     // for parallel test execution
-    const TMP_VIDEO_: &str = "tests/tmp/foo_heic_.mp4";
+    const TMP_VIDEO_: &str = "tests/tmp/foo_.mp4";
 
     fn get_photo_file() -> File {
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
