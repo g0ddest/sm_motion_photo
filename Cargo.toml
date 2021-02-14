@@ -1,6 +1,6 @@
 [package]
 name = "sm_motion_photo"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Vitaliy Velikodniy <vitaliy@velikodniy.name>"]
 edition = "2018"
 repository = "https://github.com/g0ddest/sm_motion_photo"
@@ -14,8 +14,8 @@ exclude = [
 
 [dependencies]
 memmap = "0.7.0"
-boyer-moore-magiclen = "0.2.4"
-mp4parse = "0.11.4"
+boyer-moore-magiclen = "0.2.11"
+mp4parse = "=0.11.2"
 
 [dev-dependencies]
 criterion = "0.3"
