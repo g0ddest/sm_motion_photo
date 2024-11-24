@@ -46,7 +46,7 @@ mod tests {
         };
 
         match sm_motion.find_video_index() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             _result => {}
         };
 
@@ -64,7 +64,7 @@ mod tests {
         };
 
         match sm_motion.find_video_index() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             _result => {}
         };
 
