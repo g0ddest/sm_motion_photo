@@ -23,7 +23,7 @@ impl<'a> BMByteSearchable for Bytes<'a> {
     fn value_at(&self, index: usize) -> u8 {
         self.bytes[index]
     }
-    fn iter(&self) -> Iter<u8> {
+    fn iter(&self) -> Iter<'_, u8> {
         self.bytes.iter()
     }
 }
@@ -101,11 +101,79 @@ impl SmMotion {
         let bmb = BMByte::from(&indicator).unwrap();
         let bytes = Bytes::new(&self.mmap[..]);
         // Using the first entry because it is quite unique
-        self.video_index = match bmb.find_first_in(bytes) {
-            // Move index on the length of indicator
+        let base_index = match bmb.find_first_in(bytes) {
+            // Move index on the length of indicator (right after the marker)
             Some(index) => Some(index + 16),
             None => None,
         };
+
+        // On newer Samsung devices (e.g., SG22) there may be extra bytes after the marker
+        // before the actual MP4 begins. The MP4 typically starts with an 'ftyp' box,
+        // which appears 4 bytes after the start of the file/box (after the 32-bit size).
+        // To make detection robust, scan forward from the marker for 'ftyp' and, if found,
+        // shift the starting index back by 4 bytes to the true MP4 start.
+        if let Some(start_after_marker) = base_index {
+            // Limit the scan window to avoid scanning the entire image. 64 KiB should be plenty.
+            let scan_start = start_after_marker;
+            let scan_end = (scan_start + 65536).min(self.mmap.len());
+            let scan_slice = &self.mmap[scan_start..scan_end];
+
+            // Search for 'ftyp' inside the scan window using the same Boyer-Moore engine
+            let ftyp: Vec<u8> = b"ftyp".to_vec();
+            let bmb_ftyp = BMByte::from(&ftyp).unwrap();
+            let bytes_ftyp = Bytes::new(scan_slice);
+            let adjusted = match bmb_ftyp.find_first_in(bytes_ftyp) {
+                Some(rel_pos) => {
+                    // Ensure we don't underflow when backing up 4 bytes for the size field
+                    if rel_pos >= 4 {
+                        Some(scan_start + rel_pos - 4)
+                    } else {
+                        Some(scan_start)
+                    }
+                }
+                None => None,
+            };
+            // If we didn't find 'ftyp' right after the marker (new HEIC layout),
+            // try to locate the MP4 'ftyp' elsewhere in the file. Prefer the last
+            // occurrence before the marker to avoid the HEIC's own 'ftyp' at the start.
+            if let Some(idx) = adjusted {
+                self.video_index = Some(idx);
+            } else {
+                // Define a small helper to test major brand after 'ftyp'
+                let majors: [&[u8]; 5] = [b"isom", b"mp42", b"mp41", b"iso4", b"avc1"];
+                let mut search_pos = 0usize;
+                let mmap = &self.mmap;
+                let mut chosen: Option<usize> = None;
+                while let Some(pos) = mmap[search_pos..].windows(4).position(|w| w == b"ftyp") {
+                    let abs_pos = search_pos + pos;
+                    // Check we have enough bytes to read major brand
+                    if abs_pos + 8 < mmap.len() {
+                        let major = &mmap[abs_pos + 4..abs_pos + 8];
+                        // Filter out HEIC/HEIF brands and keep MP4-like ones
+                        let is_mp4_brand = majors.iter().any(|m| *m == major);
+                        if is_mp4_brand {
+                            // Only consider positions before the SEF footer marker to avoid false positives
+                            if abs_pos < start_after_marker {
+                                chosen = Some(abs_pos);
+                            }
+                        }
+                    }
+                    // Advance search position
+                    search_pos = abs_pos + 4;
+                    if search_pos >= mmap.len() { break; }
+                }
+                if let Some(ftyp_pos) = chosen {
+                    // Back up 4 bytes for size field if possible
+                    let start = if ftyp_pos >= 4 { ftyp_pos - 4 } else { ftyp_pos };
+                    self.video_index = Some(start);
+                } else {
+                    // Fallback: keep original behavior (start right after marker)
+                    self.video_index = Some(start_after_marker);
+                }
+            }
+        } else {
+            self.video_index = None;
+        }
         Ok(self.video_index)
     }
 

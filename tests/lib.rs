@@ -18,9 +18,15 @@ mod tests {
         File::open(format!("{}/{}", dir, "tests/data/photo.jpg")).unwrap()
     }
 
-    fn get_photo_file_heic() -> File {
+    fn get_photo_file_heic(model: &str) -> File {
+
+        let ext = match model {
+            "sg22-ultra" => "-sg22-ultra",
+            _ => ""
+        };
+
         let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        File::open(format!("{}/{}", dir, "tests/data/photo.heic")).unwrap()
+        File::open(format! ("{}/{}{}.heic", dir, "tests/data/photo", ext)).unwrap()
     }
 
     fn get_wrong_photo_file() -> File {
@@ -58,7 +64,7 @@ mod tests {
 
     #[test]
     fn test_search_index_heic() {
-        let mut sm_motion = match SmMotion::with(&get_photo_file_heic()) {
+        let mut sm_motion = match SmMotion::with(&get_photo_file_heic("sgs20")) {
             Some(sm) => sm,
             None => panic!("Not created motion"),
         };
@@ -90,16 +96,21 @@ mod tests {
 
     #[test]
     fn test_dump_video_heic() {
-        let sm_motion = match SmMotion::with(&get_photo_file_heic()) {
-            Some(sm) => sm,
-            None => panic!("Not created motion"),
-        };
-        let mut file = create_video_file(TMP_VIDEO_HEIC);
-        let _ = sm_motion.dump_video_file(&mut file);
-        let mut open_file = File::open(TMP_VIDEO_HEIC).unwrap();
-        let mut context = mp4parse::MediaContext::new();
-        let _ = mp4parse::read_mp4(&mut open_file, &mut context);
-        assert_ne!(context.tracks.len(), 0);
+
+        let models = vec!["sgs20", "sg22-ultra"];
+
+        models.iter().for_each(|model| {
+            let sm_motion = match SmMotion::with(&get_photo_file_heic(model)) {
+                Some(sm) => sm,
+                None => panic!("Not created motion"),
+            };
+            let mut file = create_video_file(TMP_VIDEO_HEIC);
+            let _ = sm_motion.dump_video_file(&mut file);
+            let mut open_file = File::open(TMP_VIDEO_HEIC).unwrap();
+            let mut context = mp4parse::MediaContext::new();
+            let _ = mp4parse::read_mp4(&mut open_file, &mut context);
+            assert_ne!(context.tracks.len(), 0);
+        });
     }
 
     #[test]
